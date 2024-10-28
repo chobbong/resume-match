@@ -4,18 +4,27 @@ import os
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+from kiwipiepy import Kiwi
 
 # Initialize OpenAI client
 def initialize_openai_client(api_key):
     return OpenAI(api_key=api_key)
+
+# Initialize KIWI tokenizer
+kiwi = Kiwi()
+
+# Custom tokenizer using KIWI
+def kiwi_tokenizer(text):
+    tokens = kiwi.tokenize(text)
+    return [token.form for token in tokens]
 
 # Define functions
 def calculate_similarity_scores(jd_text, resume_texts):
     # Combine JD and resume texts
     all_texts = [jd_text] + resume_texts
 
-    # Create TF-IDF vectorizer
-    vectorizer = TfidfVectorizer(stop_words='english')
+    # Create TF-IDF vectorizer with KIWI tokenizer
+    vectorizer = TfidfVectorizer(tokenizer=kiwi_tokenizer, stop_words='english')
 
     # Generate TF-IDF matrix
     tfidf_matrix = vectorizer.fit_transform(all_texts)
